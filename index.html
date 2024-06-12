@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>配送ルート最適化ツール</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .delivery-info {
+            position: relative;
+            top: 0;
+            right: 0;
+            margin-top: 20px;
+            padding: 10px;
+            background-color: white;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            z-index: 1;
+        }
+        .delivery-info ol {
+            padding-left: 20px;
+        }
+        .delivery-info li {
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-left: 5px solid #007bff;
+            border-radius: 5px;
+            list-style-type: decimal;
+        }
+        .delivery-info li.destination {
+            font-weight: bold;
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+    <h1>配送ルート最適ツール</h1>
+    <p>テキストデータを入力または貼り付けてください。抽出された住所が下に表示され、地図上にルートが表示されます。</p>
+    <label><input type="checkbox" id="avoidTolls" checked> 有料道路を避ける</label><br>
+    <label><input type="checkbox" id="avoidHighways" checked> 高速道路を避ける</label><br>
+    <label><input type="checkbox" id="avoidFerries" checked> フェリーを避ける</label><br>
+    <label for="startLocation">出発地:</label>
+    <select id="startLocation">
+        <option value="マックスバリュ川原">マックスバリュ川原</option>
+        <option value="マックスバリュ長久手">マックスバリュ長久手</option>
+        <option value="西友高針">西友高針</option>
+        <option value="自由記述">自由記述</option>
+    </select>
+    <input type="text" id="startLocationText" placeholder="出発地の住所を入力" style="display:none; width: 100%;">
+
+    <label for="endLocation">最終到着地:</label>
+    <select id="endLocation">
+        <option value="マックスバリュ川原">マックスバリュ川原</option>
+        <option value="マックスバリュ長久手">マックスバリュ長久手</option>
+        <option value="西友高針">��友高針</option>
+        <option value="自由記述">自由記述</option>
+    </select>
+    <input type="text" id="endLocationText" placeholder="最終到着地の住所を入力" style="display:none; width: 100%;">
+
+    <label for="numClusters">人数:</label>
+    <select id="numClusters">
+        <option value="1">1人</option>
+        <option value="2">2人</option>
+        <option value="3">3人</option>
+        <option value="4">4人</option>
+    </select>
+    <textarea id="inputText" placeholder="ここにテキストを入力" style="width: 100%;"></textarea>
+    <button onclick="extractAddresses()">住所を抽出</button>
+    <div class="results" id="results"></div>
+    <button onclick="reflectOnMap()">マップに反映</button>
+    <div id="map" style="width: 100%; height: 500px;"></div>
+    <div id="deliveryInfo" class="delivery-info">
+        <ol id="routeList"></ol>
+    </div>
+    
+    <script src="config.js"></script>
+    <script>
+        document.getElementById('startLocation').addEventListener('change', function() {
+            document.getElementById('startLocationText').style.display = this.value === '自由記述' ? 'block' : 'none';
+        });
+        document.getElementById('endLocation').addEventListener('change', function() {
+            document.getElementById('endLocationText').style.display = this.value === '自由記述' ? 'block' : 'none';
+        });
+
+        // Google Maps APIを初期化
+        function loadGoogleMapsAPI() {
+            const mapScript = document.createElement('script');
+            mapScript.src = `https://maps.googleapis.com/maps/api/js?key=${API_KEY}&libraries=places&callback=initMap`;
+            mapScript.async = true;
+            mapScript.defer = true;
+            document.head.appendChild(mapScript);
+        }
+
+        // ページが読み込まれたきに図を初期化
+        window.onload = loadGoogleMapsAPI;
+    </script>
+    <script src="script.js"></script>
+</body>
+</html>
