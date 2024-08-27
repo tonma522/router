@@ -5,98 +5,118 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>配送ルート最適化ツール</title>
     <link rel="stylesheet" href="styles.css">
-    <style>
-        .delivery-info {
-            position: relative;
-            top: 0;
-            right: 0;
-            margin-top: 20px;
-            padding: 10px;
-            background-color: white;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-family: Arial, sans-serif;
-            font-size: 14px;
-            z-index: 1;
-        }
-        .delivery-info ol {
-            padding-left: 20px;
-        }
-        .delivery-info li {
-            margin-bottom: 10px;
-            padding: 10px;
-            background-color: #f9f9f9;
-            border-left: 5px solid #007bff;
-            border-radius: 5px;
-            list-style-type: decimal;
-        }
-        .delivery-info li.destination {
-            font-weight: bold;
-            color: #007bff;
-        }
-    </style>
+    <script src="config.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&family=Noto+Sans+JP:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 <body>
-    <h1>配送ルート最適ツール</h1>
-    <p>テキストデータを入力または貼り付けてください。抽出された住所が下に表示され、地図上にルートが表示されます。</p>
-    <label><input type="checkbox" id="avoidTolls" checked> 有料道路を避ける</label><br>
-    <label><input type="checkbox" id="avoidHighways" checked> 高速道路を避ける</label><br>
-    <label><input type="checkbox" id="avoidFerries" checked> フェリーを避ける</label><br>
-    <label for="startLocation">出発地:</label>
-    <select id="startLocation">
-        <option value="マックスバリュ川原">マックスバリュ川原</option>
-        <option value="マックスバリュ長久手">マックスバリュ長久手</option>
-        <option value="西友高針">西友高針</option>
-        <option value="自由記述">自由記述</option>
-    </select>
-    <input type="text" id="startLocationText" placeholder="出発地の住所を入力" style="display:none; width: 100%;">
+    <header>
+        <h1>配送ルート最適化ツール</h1>
+    </header>
+    <main>
+        <div class="container">
+            <section id="deliveryMode" class="card">
+                <h2>配送モード</h2>
+                <div class="btn-group">
+                    <button id="singleModeBtn" class="btn mode-btn active">一人配送モード</button>
+                    <button id="multiModeBtn" class="btn mode-btn">複数配送モード（2人）</button>
+                </div>
+            </section>
 
-    <label for="endLocation">最終到着地:</label>
-    <select id="endLocation">
-        <option value="マックスバリュ川原">マックスバリュ川原</option>
-        <option value="マックスバリュ長久手">マックスバリュ長久手</option>
-        <option value="西友高針">��友高針</option>
-        <option value="自由記述">自由記述</option>
-    </select>
-    <input type="text" id="endLocationText" placeholder="最終到着地の住所を入力" style="display:none; width: 100%;">
+            <section id="routeEndpoints" class="card">
+                <h2>出発地と到着地</h2>
+                <div class="input-group">
+                    <label for="startLocation">出発地:</label>
+                    <select id="startLocation">
+                        <option value="マックスバリュ川原">マックスバリュ川原</option>
+                        <option value="マックスバリュ長久手">マックスバリュ長久手</option>
+                        <option value="西友高針">西友高針</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="endLocation">到着地:</label>
+                    <select id="endLocation">
+                        <option value="マックスバリュ川原">マックスバリュ川原</option>
+                        <option value="マックスバリュ長久手">マックスバリュ長久手</option>
+                        <option value="西友高針">西友高針</option>
+                    </select>
+                </div>
+            </section>
 
-    <label for="numClusters">人数:</label>
-    <select id="numClusters">
-        <option value="1">1人</option>
-        <option value="2">2人</option>
-        <option value="3">3人</option>
-        <option value="4">4人</option>
-    </select>
-    <textarea id="inputText" placeholder="ここにテキストを入力" style="width: 100%;"></textarea>
-    <button onclick="extractAddresses()">住所を抽出</button>
-    <div class="results" id="results"></div>
-    <button onclick="reflectOnMap()">マップに反映</button>
-    <div id="map" style="width: 100%; height: 500px;"></div>
-    <div id="deliveryInfo" class="delivery-info">
-        <ol id="routeList"></ol>
-    </div>
-    
-    <script src="config.js"></script>
-    <script>
-        document.getElementById('startLocation').addEventListener('change', function() {
-            document.getElementById('startLocationText').style.display = this.value === '自由記述' ? 'block' : 'none';
-        });
-        document.getElementById('endLocation').addEventListener('change', function() {
-            document.getElementById('endLocationText').style.display = this.value === '自由記述' ? 'block' : 'none';
-        });
+            <section id="addressInputsSection" class="card">
+                <h2>経由地</h2>
+                <div id="addressInputs">
+                    <!-- 住所入力欄はJavaScriptで動的に生成されます -->
+                </div>
+                <button id="addAddress" class="btn"><i class="material-icons">add</i> 経由地を追加</button>
+                <button id="autoFill" class="btn secondary"><i class="material-icons">auto_awesome</i> 自動入力</button>
+            </section>
 
-        // Google Maps APIを初期化
-        function loadGoogleMapsAPI() {
-            const mapScript = document.createElement('script');
-            mapScript.src = `https://maps.googleapis.com/maps/api/js?key=${API_KEY}&libraries=places&callback=initMap`;
-            mapScript.async = true;
-            mapScript.defer = true;
-            document.head.appendChild(mapScript);
-        }
+            <section id="routeOptions" class="card">
+                <h2>ルートオプション</h2>
+                <label class="checkbox-container">
+                    <input type="checkbox" id="optimizeRoute" checked>
+                    <span class="checkmark"></span>
+                    ルートを最適化する
+                </label>
+                <label class="checkbox-container">
+                    <input type="checkbox" id="useHighways">
+                    <span class="checkmark"></span>
+                    高速道路を使用する
+                </label>
+                <label class="checkbox-container">
+                    <input type="checkbox" id="avoidTolls">
+                    <span class="checkmark"></span>
+                    有料道路を回避
+                </label>
+                <label class="checkbox-container">
+                    <input type="checkbox" id="avoidFerries">
+                    <span class="checkmark"></span>
+                    フェリーを回避
+                </label>
+            </section>
 
-        // ページが読み込まれたきに図を初期化
-        window.onload = loadGoogleMapsAPI;
-    </script>
-    <script src="script.js"></script>
+            <section id="controls" class="card">
+                <button id="generateRoute" class="btn primary"><i class="material-icons">route</i> 配送ルートを生成</button>
+            </section>
+
+            <section id="map" class="card" aria-label="経路地図"></section>
+            <section id="routeInfo" class="card"></section>
+
+            <section id="result" class="card">
+                <h2>生成されたURL</h2>
+                <div id="singleDeliveryResult">
+                    <div class="btn-group">
+                        <button id="copyUrl" class="btn"><i class="material-icons">content_copy</i> URLをコピー</button>
+                        <button id="openUrl" class="btn"><i class="material-icons">open_in_new</i> Google Mapsで開く</button>
+                    </div>
+                </div>
+                <div id="multiDeliveryResult" style="display: none;">
+                    <h3>配送員1のルート</h3>
+                    <div id="routeInfo1"></div>
+                    <div class="btn-group">
+                        <button id="copyUrl1" class="btn"><i class="material-icons">content_copy</i> URLをコピー</button>
+                        <button id="openUrl1" class="btn"><i class="material-icons">open_in_new</i> Google Mapsで開く</button>
+                    </div>
+                    <h3>配送員2のルート</h3>
+                    <div id="routeInfo2"></div>
+                    <div class="btn-group">
+                        <button id="copyUrl2" class="btn"><i class="material-icons">content_copy</i> URLをコピー</button>
+                        <button id="openUrl2" class="btn"><i class="material-icons">open_in_new</i> Google Mapsで開く</button>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024　配送ルート最適化ツール　All rights reserved.</p>
+    </footer>
+
+    <script src="maps.js"></script>
+    <script src="utils.js"></script>
+    <script src="routing.js"></script>
+    <script src="multiDelivery.js"></script>
+    <script src="init.js"></script>
 </body>
 </html>

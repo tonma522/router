@@ -1,79 +1,448 @@
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    margin: 20px;
-    color: #333;
-    background-color: #f5f5f5;
-}
-h1 {
-    color: #2c3e50;
-}
-textarea {
-    width: 100%;
-    height: 150px;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    resize: vertical;
-}
-button {
-    display: block;
-    margin: 10px 0;
-    padding: 10px;
-    width: 100%;
-    font-size: 16px;
-    background-color: #2c3e50;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-button:hover {
-    background-color: #34495e;
-}
-.results {
-    margin-top: 20px;
-}
-#map {
-    height: 500px;
-    width: 100%;
-    margin-top: 20px;
-    border-radius: 5px;
-}
-.address {
-    margin-bottom: 10px;
-}
-.address input {
-    width: 100%;
-    height: auto;
-    padding: 10px;
-    font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-}
-.delivery-info {
-    position: relative; /* absoluteからrelativeに変更 */
-    top: 0; /* topの値をリセット */
-    right: 0; /* rightの値をリセット */
-    margin-top: 20px; /* マージンを追加 */
-    padding: 10px;
-    background-color: white;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-family: Arial, sans-serif;
-    font-size: 14px;
-    z-index: 1;
+:root {
+    --primary-color: #333333;
+    --secondary-color: #666666;
+    --background-color: #F5F5F5;
+    --card-background: #FFFFFF;
+    --text-color: #333333;
+    --border-color: #E0E0E0;
+    --accent-color: #999999;
+    --header-text-color: #FFFFFF;
+    --shadow: 0 2px 4px rgba(0,0,0,0.1);
+    --shadow-hover: 0 4px 8px rgba(0,0,0,0.15);
+    --transition: all 0.3s ease;
+    --radius: 4px;
+
+    --mode-btn-bg: #E0E0E0;
+    --mode-btn-text: #333333;
+    --mode-btn-active-bg: #4A90E2;
+    --mode-btn-active-text: #FFFFFF;
+    --mode-btn-hover-bg: #BDBDBD;
 }
 
-/* スマホ用のメディアクエリ */
-@media screen and (max-width: 600px) {
-    body {
-        margin: 10px;
+body {
+    font-family: 'Roboto', 'Noto Sans JP', sans-serif;
+    line-height: 1.6;
+    color: var(--text-color);
+    background-color: var(--background-color);
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: var(--card-background);
+    box-shadow: var(--shadow);
+    border-radius: var(--radius);
+}
+
+header {
+    background-color: var(--primary-color);
+    color: var(--header-text-color);
+    text-align: center;
+    padding: 1.5rem 0;
+    box-shadow: var(--shadow);
+    margin-bottom: 2rem;
+}
+
+header h1 {
+    color: var(--header-text-color);
+    margin: 0;
+}
+
+h1, h2, h3, h4 {
+    margin-bottom: 1rem;
+    color: var(--primary-color);
+}
+
+.card {
+    background-color: var(--card-background);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 20px;
+    margin-bottom: 20px;
+    transition: var(--transition);
+}
+
+.card:hover {
+    box-shadow: var(--shadow-hover);
+}
+
+.input-group {
+    margin-bottom: 1.5rem;
+}
+
+label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+input[type="text"],
+select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    font-size: 1rem;
+    transition: var(--transition);
+    margin-bottom: 0.5rem;
+}
+
+input[type="text"]:focus,
+select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(51, 51, 51, 0.2);
+}
+
+.btn {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.btn:hover {
+    background-color: var(--secondary-color);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+}
+
+.btn.secondary {
+    background-color: var(--secondary-color);
+}
+
+.btn.secondary:hover {
+    background-color: var(--accent-color);
+}
+
+.btn i {
+    margin-right: 0.5rem;
+}
+
+.checkbox-container {
+    display: block;
+    position: relative;
+    padding-left: 35px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    font-size: 1rem;
+    user-select: none;
+}
+
+.checkbox-container input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+.checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 25px;
+    width: 25px;
+    background-color: #eee;
+    border-radius: var(--radius);
+    transition: var(--transition);
+}
+
+.checkbox-container:hover input ~ .checkmark {
+    background-color: #ccc;
+}
+
+.checkbox-container input:checked ~ .checkmark {
+    background-color: var(--primary-color);
+}
+
+.checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+
+.checkbox-container input:checked ~ .checkmark:after {
+    display: block;
+}
+
+.checkbox-container .checkmark:after {
+    left: 9px;
+    top: 5px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 3px 3px 0;
+    transform: rotate(45deg);
+}
+
+#map {
+    height: 400px;
+    width: 100%;
+    max-width: 100%;
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    box-sizing: border-box;
+    margin-bottom: 20px;
+}
+
+.route-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.route-card {
+    border: none;
+    border-radius: var(--radius);
+    padding: 15px;
+    background-color: #f8f9fa;
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+}
+
+.route-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+}
+
+.route-point {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.route-point i {
+    margin-right: 15px;
+    color: var(--primary-color);
+    font-size: 24px;
+}
+
+.route-point span {
+    font-weight: 500;
+}
+
+.route-details {
+    display: flex;
+    align-items: center;
+    color: var(--secondary-color);
+    font-size: 0.9rem;
+    margin-left: 39px;
+    position: relative;
+}
+
+.route-details::before {
+    content: '';
+    position: absolute;
+    left: -24px;
+    top: -15px;
+    bottom: -5px;
+    width: 2px;
+    background-color: var(--primary-color);
+}
+
+.route-details i {
+    color: var(--accent-color);
+    margin-right: 10px;
+}
+
+.route-summary {
+    background-color: #f0f0f0;
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-top: 30px;
+    box-shadow: var(--shadow);
+}
+
+.route-summary h4 {
+    color: var(--primary-color);
+    margin-bottom: 15px;
+}
+
+.route-summary p {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.route-summary i {
+    margin-right: 10px;
+    color: var(--secondary-color);
+}
+
+.address-input {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    gap: 10px;
+    flex-wrap: nowrap;
+}
+
+.address-input label {
+    flex: 0 0 auto;
+    white-space: nowrap;
+    margin-bottom: 0;
+    margin-right: 10px;
+}
+
+.address-input input[type="text"] {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.address-input button {
+    flex: 0 0 auto;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 50%;
+    transition: var(--transition);
+}
+
+.address-input button:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.address-input button i {
+    color: var(--primary-color);
+}
+
+footer {
+    text-align: center;
+    padding: 1rem 0;
+    background-color: var(--primary-color);
+    color: white;
+    margin-top: 2rem;
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 15px;
+        margin: 0;
+        border-radius: 0;
     }
-    textarea {
-        height: 100px;
+
+    .card {
+        padding: 15px;
     }
+
+    .btn {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .address-input {
+        flex-wrap: wrap;
+    }
+
+    .address-input label {
+        flex-basis: 100%;
+        margin-bottom: 5px;
+    }
+
+    .address-input input[type="text"] {
+        flex-basis: calc(100% - 120px);
+    }
+
+    .address-input button {
+        flex-basis: auto;
+    }
+
     #map {
         height: 300px;
+        width: 100%;
+        max-width: 100%;
+        margin: 0 0 15px 0;
+        padding: 0;
+        border-radius: 0;
+    }
+}
+
+@media (max-width: 1024px) {
+    .container {
+        max-width: 100%;
+        padding: 15px;
+        margin: 0;
+        border-radius: 0;
+    }
+
+    #map {
+        width: 100%;
+        max-width: 100%;
+        margin: 0 0 15px 0;
+        padding: 0;
+        border-radius: 0;
+    }
+}
+
+.url-group {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.url-group .btn {
+    flex: 1;
+    max-width: 200px;
+}
+
+.mode-btn {
+    padding: 12px 24px;
+    margin: 5px;
+    border: none;
+    background-color: var(--mode-btn-bg);
+    color: var(--mode-btn-text);
+    cursor: pointer;
+    transition: var(--transition);
+    border-radius: var(--radius);
+    font-weight: 500;
+    box-shadow: var(--shadow);
+    font-size: 1rem;
+}
+
+.mode-btn:hover {
+    background-color: var(--mode-btn-hover-bg);
+    transform: translateY(-2px);
+}
+
+.mode-btn.active {
+    background-color: var(--mode-btn-active-bg);
+    color: var(--mode-btn-active-text);
+    box-shadow: var(--shadow-hover);
+    transform: translateY(-2px);
+}
+
+.btn-group {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+    gap: 15px;
+}
+
+@media (max-width: 768px) {
+    .btn-group {
+        flex-direction: column;
+    }
+
+    .mode-btn {
+        width: 100%;
+        margin: 5px 0;
     }
 }
