@@ -13,6 +13,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const avoidFerriesCheckbox = document.getElementById('avoidFerries');
     const optimizeRouteCheckbox = document.getElementById('optimizeRoute');
 
+    // デフォルトで高速道路と有料道路を使用しない設定
+    useHighwaysCheckbox.checked = false;
+    avoidTollsCheckbox.checked = true;
+
     const options = {
         useHighwaysCheckbox,
         avoidTollsCheckbox,
@@ -105,6 +109,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    function getRouteOptions() {
+        return {
+            useHighways: useHighwaysCheckbox.checked,
+            avoidTolls: avoidTollsCheckbox.checked,
+            avoidFerries: avoidFerriesCheckbox.checked,
+            optimizeRoute: optimizeRouteCheckbox.checked
+        };
+    }
+
     async function generateSingleRoute() {
         const addresses = getAddresses();
         const startLocation = startLocationSelect.value;
@@ -130,8 +143,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const route = [startCoord, ...waypoints, endCoord];
 
+            const routeOptions = getRouteOptions();
+            
             // マップの更新
-            updateMap(route, []);
+            updateMap(route, [], routeOptions);
 
             // 経路情報の取得と表示
             const routeInfo = await getRouteInfo(route);
@@ -183,6 +198,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 point.deliveryTime = addresses[index].deliveryTime;
             });
 
+            const routeOptions = getRouteOptions();
+
             const routes = optimizeMultiDeliveryRoute(waypoints, startCoord, endCoord);
             const urls = generateMultiDeliveryUrls(routes);
 
@@ -201,7 +218,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (openUrl2) openUrl2.onclick = () => window.open(urls.url2, '_blank');
 
             // マップの更新
-            updateMap(routes.route1, routes.route2);
+            updateMap(routes.route1, routes.route2, routeOptions);
 
             // 経路情報の表示
             await displayRouteInfo(routes.route1, 'routeInfo1', await getRouteInfo(routes.route1));
@@ -400,8 +417,8 @@ function addAddressInput() {
     const addressInput = document.createElement('div');
     addressInput.className = 'address-input';
     addressInput.innerHTML = `
-        <label for="address${index}">住所${index}:</label>
-        <input type="text" id="address${index}" placeholder="住所を入力">
+        <label for="address${index}">経由地${index}:</label>
+        <input type="text" id="address${index}" placeholder="経由地を入力">
         <label for="deliveryTime${index}">配達時間（分）:</label>
         <input type="number" id="deliveryTime${index}" value="5" min="1" max="60">
         <button class="remove-address"><i class="material-icons">remove_circle_outline</i></button>

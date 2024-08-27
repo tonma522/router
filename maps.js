@@ -24,7 +24,7 @@ function initMap() {
     });
 }
 
-function updateMap(route1, route2) {
+function updateMap(route1, route2, options) {
     if (!map || !directionsService || !directionsRenderer1 || !directionsRenderer2) {
         console.error('Map or directions not initialized');
         return;
@@ -39,13 +39,21 @@ function updateMap(route1, route2) {
         directionsRenderer2.setMap(map);
     }
 
+    const routeOptions = {
+        avoidHighways: !options.useHighways,
+        avoidTolls: options.avoidTolls,
+        avoidFerries: options.avoidFerries,
+        optimizeWaypoints: options.optimizeRoute
+    };
+
     // ルート1の表示
     if (route1 && route1.length > 1) {
         const request1 = {
             origin: new google.maps.LatLng(route1[0].lat, route1[0].lng),
             destination: new google.maps.LatLng(route1[route1.length - 1].lat, route1[route1.length - 1].lng),
             waypoints: route1.slice(1, -1).map(point => ({location: new google.maps.LatLng(point.lat, point.lng), stopover: true})),
-            travelMode: 'DRIVING'
+            travelMode: 'DRIVING',
+            ...routeOptions
         };
 
         directionsService.route(request1, (result, status) => {
@@ -63,7 +71,8 @@ function updateMap(route1, route2) {
             origin: new google.maps.LatLng(route2[0].lat, route2[0].lng),
             destination: new google.maps.LatLng(route2[route2.length - 1].lat, route2[route2.length - 1].lng),
             waypoints: route2.slice(1, -1).map(point => ({location: new google.maps.LatLng(point.lat, point.lng), stopover: true})),
-            travelMode: 'DRIVING'
+            travelMode: 'DRIVING',
+            ...routeOptions
         };
 
         directionsService.route(request2, (result, status) => {
